@@ -35,7 +35,7 @@ class Rotor:
             return self.nextRotor.passivetype(offset)
         else:
             return self.passivetype(offset)
-    def passivetype(self,index):
+#    def passivetype(self,index):
 
     def setNextRotor(self,rotor):
         self.nextRotor = rotor
