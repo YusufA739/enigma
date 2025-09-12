@@ -1,4 +1,4 @@
-import random,string,sys
+import random,sys,time,string
 
 def listify(string):
     str_list = []
@@ -14,6 +14,17 @@ def delistify(list):
     for carrier in list:
         list_str += carrier
     return list_str
+
+def print2(stringus,letterDelay=None):
+    if letterDelay is not None:
+        delay = letterDelay
+    else:
+        delay = 0.01
+    for letter in stringus:
+        sys.stdout.write(letter)
+        time.sleep(delay)
+    sys.stdout.flush()
+    print()
 
 def rotorgen(charset,offset,seed):  #takes string charset, returns string charset
     random.seed(seed)
@@ -78,27 +89,32 @@ def process(letter,a,b,c,moveA,moveB,moveC,masonCharset):
 
 
 #moveAin code
-masonCharset = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't','u', 'v', 'w', 'x', 'y', 'z','0', '1', '2', '3', '4', '5', '6', '7', '8', '9', " ", "."]  #no punctuation or uppercase for moveAsonCharset
+masonCharset = ['A', 'B', 'C','D', 'E', 'F','G', 'H', 'I','J', 'K', 'L','M', 'N', 'O','P', 'Q', 'R','S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't','u', 'v', 'w', 'x', 'y', 'z','0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' ', '.', ',', '-', '_', '\'', '!', '?', '"', '@', ';', ':', '(', ')']  #no punctuation or uppercase for moveAsonCharset
 mason = []
 for carrier in range(len(masonCharset)):
     mason.append(str(carrier))
 
-a = rotorgen(mason.copy(),1,1)  #standard rotor
+a = rotorgen(mason.copy(),3,1)  #standard rotor
 b = rotorgen(mason.copy(),1,2)  #standard rotor
 c = rotorgen(mason.copy(),1,3)  #standard rotor
-r = reflectorgen(mason.copy(),4)
+#r = reflectorgen(mason.copy(),4)
 r = basicReflector(mason.copy())
 
-print(len(mason),"OPERATOR, CHECK THIS IS EVEN. ADD CHARACTERS TO CHARSET IF NOT EVEN")
-notchA = 3
-notchB = 10
+if len(mason)%2 == 0:
+    print2("VALID CHARSET DETECTED",0.01)
+else:
+    print2("INVALID CHARSET DETECTED, SYSTEM INSTABILITY WARNING",0.01)
+notchA = 14
+notchB = 2
 notchC = 0
 
 moveA = 0
 moveB = 0
 moveC = 0
-letter = input(">>> ")
+letter = input(">>>")
 for carrier in letter:
     carrier,a,b,c,moveA,moveB,moveC = process(carrier,a,b,c,moveA,moveB,moveC,masonCharset)
     sys.stdout.write(carrier)
+    time.sleep(0.01)
 print()
+input("Press enter to exit")
