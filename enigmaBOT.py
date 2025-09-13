@@ -89,8 +89,8 @@ def letterToIndex(unmoddedCharset,letter):
             return index
     return "NULL"
 
-def process(letter,a,b,c,moveA,moveB,moveC,masonCharset):
-    c0 = letterToIndex(masonCharset,letter)
+def process(letter,a,b,c,moveA,moveB,moveC,msc):
+    c0 = letterToIndex(msc,letter)
 
     a = advanceRotor(a)
     moveA = (moveA + 1) % len(a)
@@ -138,7 +138,12 @@ moveC = 0
 async def on_message(message):
     global run_once,masonCharset,notchA,notchB,notchC,moveA,moveB,moveC,a,b,c,r,mason
 
-    if message.content.lower() == "/reset" or message.content.lower() == "/start":
+    if message.author != client.user:
+        masonCharset = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
+                        'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+                        'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4',
+                        '5', '6', '7', '8', '9', ' ', '.', ',', '-', '_', '\'', '!', '?', '"', '@', ';', ':', '(',
+                        ')', '/', '#']  # no punctuation or uppercase for moveAsonCharset
         mason = []
         for carrier in range(len(masonCharset)):
             mason.append(str(carrier))
@@ -149,11 +154,8 @@ async def on_message(message):
         # r = reflectorgen(mason.copy(),4)
         r = basicReflector(mason.copy())
 
+        masonCharset = plugboardSettings(masonCharset.copy(), 1, 1)
 
-        if len(mason) % 2 == 0:
-            await message.channel.send("VALID CHARSET DETECTED")
-        else:
-            await message.channel.send("INVALID CHARSET DETECTED, SYSTEM INSTABILITY WARNING")
         notchA = 4
         notchB = 6
         notchC = 0
@@ -161,23 +163,20 @@ async def on_message(message):
         moveA = 0
         moveB = 0
         moveC = 0
-        message.channel.send("BOT IS ONLINE")
 
-    elif message.author != client.user:
         messageWords = message.content.lower().strip().split() #default split() is by spaces (" ") and strip is to remove whitespace from start and end (defualt)
         if messageWords[0] == "/help" or messageWords[0] == "!help" or messageWords[0] == "/encodehelp" or messageWords[0] == "!encodehelp":
-            await message.channel.send("Type '/chatpgt <YOUR MESSAGE HERE>' to use ChatGPT (For now, only words can be sent thru API (afaik)")
+            await message.channel.send("Type /start then /encode to initalise then send a message respectively (RESET BEFORE TYPING NEW REPORTS/MESSAGES)")
         elif messageWords[0] == "!encode" or messageWords[0] == "/encode": #allow for there to be a use of the old command format (!) and the new command format (/) but make
             #sure that the command is at the start (don't use contains or in because I want it to be at the beginning to match other bots)
-
-            messageContent = message.content.strip("!encode") #remove command word
-            messageContent = messageContent.strip("/encode") #remove alt command word
-            messageContent = messageContent.strip() #strips the leading and trailing whitespace by default
+            messageContent = message.content.strip() #strips the leading and trailing whitespace by default
             if messageContent == "":
                 await message.channel.send("PUT SOME WORDS WITH THE COMMAND THEN!!!")
             else:
+                messageContent = message.content[8:]
                 string = ""
-                for carrier in message.content:
+
+                for carrier in messageContent:
                     carrier,a,b,c,moveA,moveB,moveC = process(carrier,a,b,c,moveA,moveB,moveC,masonCharset)
                     string += carrier
                 await message.channel.send(string)
